@@ -71,7 +71,8 @@ resource "google_cloudbuild_trigger" "chibawest_gamecenter_apps_was_built" {
   name = "chibawest-gamecenter-apps-was-built"
   pubsub_config {
     topic = google_pubsub_topic.chibawest_gamecenter_apps_was_built.id
-    repo_name = github_mytk0u0_chibawest-gamecenter-manifest  # これが対応してない
+    branch_name = "main"  # これが対応してない
+    repo_name = "github_mytk0u0_chibawest-gamecenter-manifest"  # これが対応してない
   }
 
   filename = "cloudbuild.yaml"
