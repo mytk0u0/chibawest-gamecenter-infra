@@ -1,6 +1,12 @@
-# terraform
+# chibawest-gamecenter-infra
+
+chibawest-gamecenterのTerraformまわり
 
 ## セットアップ
+
+terraformのバージョン1.0.5を使ってます。
+
+### tfenv
 
 ```bash:mac
 brew install tfenv
@@ -16,14 +22,11 @@ tfenv install 1.0.5
 
 ## 開発
 
-`terrafrom plan` して問題ないか確認したら `terraform apply` でOK。
+merge前に `terrafrom plan` して問題ないか確認する。
+mainにmergeしたらCloud Buildで `terraform apply` が走る。
 
-## Minecraft
+## その他
 
-### 参考資料
+### Minecraftの設定変更
 
-docker-minecraft-bedrock-server:  
-<https://github.com/itzg/docker-minecraft-bedrock-server>
-
-Java版Minecraftのterraformファイル:  
-<https://github.com/futurice/terraform-examples/blob/master/google_cloud/minecraft/main.tf>
+GCPの[VMインスタンス](https://console.cloud.google.com/compute/instances?project=chibawest-gamecenter)からインスタンスにsshできるので、そこで `sudo docker exec -i mc rcon-cli` すればOK。
