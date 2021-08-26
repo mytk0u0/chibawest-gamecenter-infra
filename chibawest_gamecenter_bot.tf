@@ -42,11 +42,7 @@ resource "google_container_node_pool" "app_chibawest_gamecenter_bot" {
   name     = "app-chibawest-gamecenter-bot-node-pool"
   location = local.region
   cluster  = google_container_cluster.chibawest_gamecenter.name
-
-  autoscaling {
-    min_node_count = 1
-    max_node_count = 1
-  }
+  node_count = 1
 
   node_config {
     preemptible  = true
