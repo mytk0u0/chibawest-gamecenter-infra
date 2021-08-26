@@ -30,7 +30,7 @@ resource "google_container_cluster" "chibawest_gamecenter" {
 
 resource "google_cloudbuild_trigger" "chibawest_gamecenter" {
   trigger_template {
-    branch_name = "master"
+    branch_name = "main"
     repo_name   = "chibawest-gamecenter-infra"
   }
 
