@@ -5,6 +5,7 @@ steps:
   - name: '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPOSITORY}/terraform'
     args:
       - apply
+      - -auto-approve
 substitutions:
   _REGION: asia-northeast1
   _PROJECT_ID: chibawest-gamecenter
