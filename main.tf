@@ -28,10 +28,19 @@ resource "google_container_cluster" "chibawest_gamecenter" {
   initial_node_count       = 1
 }
 
-resource "google_cloudbuild_trigger" "chibawest_gamecenter" {
+resource "google_cloudbuild_trigger" "chibawest_gamecenter_infra" {
   trigger_template {
     branch_name = "main"
     repo_name   = "chibawest-gamecenter-infra"
+  }
+
+  filename = "cloudbuild.yaml"
+}
+
+resource "google_cloudbuild_trigger" "chibawest_gamecenter_apps" {
+  trigger_template {
+    branch_name = "main"
+    repo_name   = "chibawest-gamecenter-apps"
   }
 
   filename = "cloudbuild.yaml"

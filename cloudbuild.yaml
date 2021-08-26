@@ -1,4 +1,11 @@
 steps:
-  - name: 'gcr.io/chibawest-gamecenter-infra/terraform'
+  - name: '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPOSITORY}/terraform'
+    args:
+      - init
+  - name: '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPOSITORY}/terraform'
     args:
       - apply
+substitutions:
+  _REGION: asia-northeast1
+  _PROJECT_ID: chibawest-gamecenter
+  _REPOSITORY: app-cloudbuild-terraform-builder
