@@ -8,12 +8,16 @@ terraformのバージョン1.0.5を使ってます。
 
 ### tfenv
 
-```bash:mac
+#### macOS
+
+```bash
 brew install tfenv
 tfenv install 1.0.5
 ```
 
-```bash:ubuntu
+#### Ubuntu
+
+```bash
 git clone https://github.com/tfutils/tfenv.git ~/.tfenv
 echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
 source .bash_profile
@@ -22,8 +26,8 @@ tfenv install 1.0.5
 
 ## 開発
 
-merge前に `terrafrom plan` して問題ないか確認する。
-mainにmergeしたらCloud Buildで `terraform apply` が走る。
+merge前に `terrafrom plan` して問題ないか確認する。  
+mainにmergeしたらCloud Buildで勝手に `terraform apply` が走る。
 
 ## その他
 
