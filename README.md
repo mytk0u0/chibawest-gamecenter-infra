@@ -29,6 +29,8 @@ tfenv install 1.0.5
 merge前に `terrafrom plan` して問題ないか確認する。  
 mainにmergeしたらCloud Buildで勝手に `terraform apply` が走る。
 
+GCPが壊れたりしたら辛いので、mainはpushできないようにしてある。
+
 ## その他
 
 ### Minecraftの設定変更
