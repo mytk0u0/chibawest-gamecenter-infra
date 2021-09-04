@@ -19,11 +19,6 @@ resource "google_project_iam_member" "bot_user" {
   member = "serviceAccount:${google_service_account.app_chibawest_gamecenter_bot.email}"
 }
 
-resource "google_project_iam_member" "artifact_reader" {
-  role   = "roles/artifactregistry.reader"
-  member = "serviceAccount:${google_service_account.app_chibawest_gamecenter_bot.email}"
-}
-
 resource "google_project_iam_member" "secret_accessor" {
   role   = "roles/secretmanager.secretAccessor"
   member = "serviceAccount:${google_service_account.app_chibawest_gamecenter_bot.email}"
@@ -38,20 +33,64 @@ resource "google_artifact_registry_repository" "app_chibawest_gamecenter_bot" {
   format        = "DOCKER"
 }
 
-resource "google_container_node_pool" "app_chibawest_gamecenter_bot" {
-  name     = "app-chibawest-gamecenter-bot-node-pool"
-  location = local.region
-  cluster  = google_container_cluster.chibawest_gamecenter.name
-  node_count = 1
+resource "google_compute_network" "app_chibawest_gamecenter_bot" {
+  name = "app-chibawest-gamecenter-bot"
+}
 
-  node_config {
-    preemptible  = true
-    machine_type = "e2-micro"
+resource "google_compute_firewall" "app_chibawest_gamecenter_bot" {
+  name    = "app-chibawest-gamecenter-bot"
+  network = google_compute_network.app_chibawest_gamecenter_bot.name
 
-    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-    service_account = google_service_account.app_chibawest_gamecenter_bot.email
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
-    ]
+  # ICMP (ping)
+  allow {
+    protocol = "icmp"
+  }
+
+  # SSH (for RCON-CLI access)
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  target_tags = ["app-chibawest-gamecenter-bot"]
+}
+
+resource "google_compute_instance" "app_chibawest_gamecenter_bot" {
+  name         = "app-chibawest-gamecenter-bot-instance"
+  machine_type = "e2-micro"
+  zone         = local.zone
+  tags         = ["app-chibawest-gamecenter-bot"]
+
+  metadata_startup_script = <<-EOF
+    mkdir -p /var/chibawest-gamecenter-bot
+  
+    toolbox --version \
+    && toolbox -q /google-cloud-sdk/bin/gcloud secrets versions access latest \
+      --secret="app-chibawest-gamecenter-bot-application-credentials" > \
+      /var/chibawest-gamecenter-bot/google_application_credentials.json \
+    && docker run -d --rm \
+        -v /var/chibawest-gamecenter-bot:/chibawest-gamecenter-bot/data \
+        --name gc-bot \
+        mytk0u0/chibawest-gamecenter-bot:latest
+  EOF
+
+  metadata = {
+    enable-oslogin = "TRUE"
+  }
+
+  boot_disk {
+    initialize_params {
+      image = "cos-cloud/cos-stable"
+    }
+  }
+
+  network_interface {
+    network = google_compute_network.app_chibawest_gamecenter_bot.name
+    access_config {}
+  }
+
+  service_account {
+    email  = google_service_account.app_chibawest_gamecenter_bot.email
+    scopes = ["cloud-platform"]
   }
 }
