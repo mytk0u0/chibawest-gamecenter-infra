@@ -3,10 +3,11 @@ resource "google_service_account" "minecraft" {
   display_name = "Minecraft"
 }
 
-# マイクラのデータ置き場 (これが死んだら終わり)
+# イメージディスク内のファイル (マイクラ起動スクリプト) に実行権限を持たせることはできない。
+# なので、データ保存用のdiskを用意して実行権限を持たせてマウントするようにする。
 resource "google_compute_disk" "minecraft_data" {
   name    = "minecraft-data-disk"
-  size    = 35
+  size    = 5
   type    = "pd-ssd"
   zone    = local.zone
   project = local.project
