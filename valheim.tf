@@ -3,13 +3,6 @@ resource "google_service_account" "valheim" {
   display_name = "Valheim"
 }
 
-resource "google_compute_disk" "valheim" {
-  name    = "valheim-disk"
-  size    = 10
-  type    = "pd-ssd"
-  zone    = local.zone
-  project = local.project
-}
 
 resource "google_compute_address" "valheim" {
   name   = "valheim-ip"
@@ -55,36 +48,15 @@ resource "google_compute_instance" "valheim" {
   zone         = local.zone
   tags         = ["valheim"]
 
-  metadata_startup_script = <<-EOF
-    if blkid /dev/sdb;then
-        :
-    else
-        mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
-    fi
-    mkdir -p /mnt/disks/valheim
-    mount -o discard,defaults /dev/sdb /mnt/disks/valheim
-    mkdir -p /mnt/disks/valheim/{config,data}
-
-    docker run -d --rm \
-        --name valheim-server \
-        --cap-add=sys_nice \
-        --stop-timeout 120 \
-        -p 2456-2457:2456-2457/udp \
-        -v /mnt/disks/valheim/config:/config \
-        -v /mnt/disks/valheim/data:/opt/valheim \
-        -e SERVER_NAME="Chiba West Gamecenter" \
-        -e WORLD_NAME="ChibaWest" \
-        -e SERVER_PASS="chibawest" \
-        lloesche/valheim-server
-  EOF
-
   metadata = {
     enable-oslogin = "TRUE"
   }
 
   boot_disk {
     initialize_params {
-      image = "cos-cloud/cos-stable"
+      size  = 15
+      type  = "pd-ssd"
+      image = "ubuntu-minimal-2004-lts"
     }
   }
 
@@ -104,14 +76,4 @@ resource "google_compute_instance" "valheim" {
     preemptible       = true # Closes within 24 hours (sometimes sooner)
     automatic_restart = false
   }
-
-  lifecycle {
-    ignore_changes = [attached_disk]
-  }
 }
-
-resource "google_compute_attached_disk" "valheim" {
-  disk     = google_compute_disk.valheim.id
-  instance = google_compute_instance.valheim.id
-}
-

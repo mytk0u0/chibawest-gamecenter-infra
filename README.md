@@ -41,7 +41,82 @@ GCPの[VMインスタンス](https://console.cloud.google.com/compute/instances?
 
 ### Valheim
 
-#### データ移行
+#### Valheimのセットアップ
 
-ゲームデータのディレクトリのworldsの中の `ChibaWest.{db,fwl}` を移せばOK。
-Windowsから移すときはroot:rootの644に権限設定したほうがいいかも。
+SteamCMDを入れてアプリケーション用のユーザーで実行。
+
+```bash
+sudo useradd -m steam
+cd /home/steam
+
+sudo add-apt-repository multiverse
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install lib32gcc1 steamcmd
+
+sudo mkdir -p /game/save/
+sudo chown -R steam /game
+sudo -u steam /usr/games/steamcmd
+```
+
+valheimをインストール。
+
+```bash
+login anonymous
+force_install_dir /game/
+app_update 896660 validate
+```
+
+起動スクリプトを修正。
+
+```bash
+sudo apt install vim
+cd /game/
+sudo -u steam vim start_server.sh
+```
+
+1行目に `#!/bin/bash` を追記 + valheim_server.x86_64を実行している行を以下のように修正。
+
+```bash
+./valheim_server.x86_64 -name "Chiba West Gamecenter" -port 2456 -world "ChibaWest" -password "chibawest" -savedir "/game/save/" -public 0
+```
+
+動作確認。
+
+```bash
+sudo -u steam ./start_server.sh
+```
+
+サーバーが問題なく起動してそうだったらsystemdに登録する。
+
+```bash
+sudo vim /etc/systemd/system/valheim-server.service
+```
+
+こんな感じ。
+
+```bash
+[Unit]
+Description=Valheim Server
+After=network-online.target
+
+[Service]
+User=steam
+Group=steam
+WorkingDirectory=/game/
+ExecStart=/game/start_server.sh
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+```
+
+設定できたらサービスを実行。
+statusをみてfailしてないことを確認しておく。
+初回起動で/game/save/worldsが生成されるので、データを移行する場合はここのファイルを置換する。
+
+```bash
+sudo systemctl enable valheim-server.service
+sudo systemctl start valheim-server.service
+sudo systemctl status valheim-server.service
+```
