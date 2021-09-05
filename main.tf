@@ -27,12 +27,12 @@ resource "google_cloudbuild_trigger" "chibawest_gamecenter_infra" {
   filename = "cloudbuild.yaml"
 }
 
-resource "google_cloudbuild_trigger" "chibawest_gamecenter_apps" {
-  name = "chibawest-gamecenter-apps-was-merged"
-  trigger_template {
-    branch_name = "main"
-    repo_name   = "github_mytk0u0_chibawest-gamecenter-apps"
-  }
-
-  filename = "cloudbuild.yaml"
+# Cloud Build
+resource "google_artifact_registry_repository" "app_cloudbuild_terraform_builder" {
+  provider      = google-beta
+  project       = local.project
+  location      = local.region
+  repository_id = "app-cloudbuild-terraform-builder"
+  description   = "Container Repository of CloudBuild Terraform Builder"
+  format        = "DOCKER"
 }

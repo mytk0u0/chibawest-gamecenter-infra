@@ -29,8 +29,19 @@ tfenv install 1.0.5
 merge前に `terrafrom plan` して問題ないか確認する。  
 mainにmergeしたらCloud Buildで勝手に `terraform apply` が走る。
 
+GCPが壊れたりしたら辛いので、mainはpushできないようにしてある。
+
 ## その他
 
-### Minecraftの設定変更
+### Minecraft
+
+#### 設定変更
 
 GCPの[VMインスタンス](https://console.cloud.google.com/compute/instances?project=chibawest-gamecenter)からインスタンスにsshできるので、そこで `sudo docker exec -i mc rcon-cli` すればOK。
+
+### Valheim
+
+#### データ移行
+
+ゲームデータのディレクトリのworldsの中の `ChibaWest.{db,fwl}` を移せばOK。
+Windowsから移すときはroot:rootの644に権限設定したほうがいいかも。
