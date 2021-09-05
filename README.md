@@ -118,5 +118,5 @@ statusをみてfailしてないことを確認しておく。
 ```bash
 sudo systemctl enable valheim-server.service
 sudo systemctl start valheim-server.service
-sudo systemctl status valheim-server.service -n20
+sudo systemctl status valheim-server.service
 ```
